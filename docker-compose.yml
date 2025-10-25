@@ -1,12 +1,47 @@
-version: "3.9"
 services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: casestudy
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports: ["5432:5432"]
+
   api:
     build: .
     command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
     volumes: [".:/app"]
+    environment:
+      - DATABASE_URL=postgresql+psycopg://app:app@db:5432/casestudy
+      - API_KEY=letmein123
+      - OLLAMA_BASE=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2:3b
+      - USE_OLLAMA=1
+    depends_on:
+      - db
     ports: ["8000:8000"]
+
   streamlit:
     build: .
     command: streamlit run frontend/app.py --server.port=8501 --server.address=0.0.0.0
     volumes: [".:/app"]
+    environment:
+      - API_BASE=http://api:8000
+    depends_on:
+      - api
     ports: ["8501:8501"]
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports: ["11434:11434"]
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=15m
+
+volumes:
+  pgdata:
+  ollama:

@@ -1,9 +1,26 @@
-.venv/
-.env
+# Python
 __pycache__/
 *.pyc
-.vscode/
+
+# Editor/OS
 .DS_Store
-*.log
-models/*.joblib
+.vscode/
+.idea/
+
+# Data / generated
 data/
+models/
+*.pdf
+*.xlsx
+*.csv
+*.parquet
+
+# Docker / local volumes
+pgdata/
+.qdrant/
+redis-data/
+mongo-data/
+
+# Streamlit
+.streamlit/cache/
+
